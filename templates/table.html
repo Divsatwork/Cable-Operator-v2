@@ -1,0 +1,100 @@
+$def with (table) 
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Master Table</title>
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css'>
+<style type="text/css">
+.button {
+    background-color: white; /* Green */
+    border: none;
+    border-radius: 8px;
+    color: green;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}.button {
+    background-color: white; /* Green */
+    border: none;
+    border-radius: 8px;
+    color: green;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+  .main-page {
+  height: 100%;
+}
+
+.warning {
+  margin-top: 135px;
+}
+ th{
+  background-color: #4CAF50;
+    color: white;
+ }
+
+ tr:hover {background-color: #f5f5f5; color: green;}
+
+ th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+</style>
+<script type="text/javascript">
+  function set(row){
+    var index=row.rowIndex;
+    var x = document.getElementById("myTable").rows[index].cells;
+    document.getElementById("user").value=x[0].innerHTML;
+    alert("Values copied to clipboard");
+    alert("Now please select an action");
+  }
+</script>
+<script src="tsorter.min.js" type="text/javascript">
+</script>
+</head>
+
+<body>
+  <div class="ui inverted vertical masthead center aligned segment main-page">
+    <div class="ui container">
+      <div class="ui large secondary inverted pointing menu">
+        <a class="item" href="/">Home</a>
+        <a class="item" href="payment">Payment</a>
+        <a class="item" href="users">Users</a>
+      </div>
+    </div><br><br><br>
+    <div style="overflow-y: auto;">
+    <table align="center" border="1" width="75%" id="myTable">
+    <th>VC No</th><th>Name</th><th>Balance</th><th>Contact</th>
+      $for row in table:
+        <tr onclick="set(this);"><td id="$row[0]">$row[0]</td><td>$row[1]</td><td>$row[2]</td><td>$row[3]</td></tr>
+    </table>
+    </div>
+    <form name="myform">
+    <input type="hidden" name="user" id="user"><br>
+    <button type="submit" formaction="payment" class="button">Payment</button><br><br>
+    <button type="submit" formaction="del" class="button">Delete</button>
+    </form>
+  </div>
+</body>
+</html>

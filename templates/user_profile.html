@@ -1,0 +1,195 @@
+$def with (userInfo, plansInfo)
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>CRM operator</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/button.css" rel="stylesheet">
+    <link href="/static/css/modal.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">CRM Helper</a>
+      <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="#">Backup</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file"></span>
+                  Pay Now
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="shopping-cart"></span>
+                  Evaluate
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/users">
+                  <span data-feather="users"></span>
+                  Customers
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="bar-chart-2"></span>
+                  Plans
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="layers"></span>
+                  Backup
+                </a>
+              </li>
+            </ul>
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Saved reports</span>
+              <a class="d-flex align-items-center text-muted" href="#">
+                <span data-feather="plus-circle"></span>
+              </a>
+            </h6>
+            <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Current month
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Last month
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Monthly
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Yearly
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <h2>User Profile</h2><br>
+            <label>User Id: </label>$userInfo.get('Id','None')<br><br>
+            <label>User's Name: </label>$userInfo.get('userName','None')<br><br>
+            <label>User's Contact: </label>$userInfo.get('contact','None')<br><br>
+            <label>User's Address: </label>$userInfo.get('address','None')<br><br>
+            <label>User's Balance: </label>$userInfo.get('balance','None')<br><br>
+            <label>User's Subscribed Plans: </label>
+            $if userInfo['plan'] is not None:
+                $if len(userInfo['plan']) == 0:
+                    None
+                $else:
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                <th>Plan Name</th>
+                                <th>Plan ID</th>
+                                <th>Date of Subscription</th>
+                                <th>Active</th>
+                                <th>Date of Termination</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                        <tbody>
+                    $for i in userInfo['plan']:
+                        <tr>
+                        <td>$i.get('planName','None')</td>
+                        <td>$i.get('planId','No Plan Id')</td>
+                        <td>$i.get('dateOfSubscription','N/A')</td>
+                        $if i['isActive']==True:
+                            <td>True</td>
+                            <td>None</td>
+                            <td><button id="endBtn" class="end-btn-smallest">End Subscription</button></td>
+                            </tr>
+                        $else:
+                            <td>False</td>
+                            <td>$i.get('dateOfTermination','Oops')</td>
+                            <td>No actions available</td>
+                            </tr>
+                    </tbody>
+                </table>
+                <br><br><button class="btn-small" id="myBtn">Add subscription</button>
+                    </div>
+               
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+            <span class="close">&times;</span>
+                <form action="/users/plans/add" method="POST">
+                    <label>User Id: </label>
+                    <input type="text" id="userId" name="userId" value="$userInfo.get('Id','None')" readonly="readonly">
+                    <select id="myPlanList" name="myPlanList" autofocus>
+                    $if plansInfo is not None:
+                        $for i in plansInfo:
+                            <option>$i['planName']</option>
+                    </select><br><br>
+                    <button type="submit" class="btn-small">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div id="endSubscriptionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <form action="/users/plans/end" method="POST">
+                    <label>User Id: </label>
+                    <input type="text" id="userId" name="userId" value="$userInfo.get('Id','None')" readonly="readonly"><br>
+                    <label>Plan Name: </label>
+                    <input type="text" id="endSubPlanName" name="planName" readonly="readonly"><br>
+                    <label>Plan Id: </label>
+                    <input type="text" id="endSubPlanId" name="planId" readonly="readonly"><br><br>
+                    <button type="submit" class="btn-small">End Subscription</button>
+                </form>
+            </div>
+        </div>
+        </main>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="/static/scripts/bootstrap.min.js"></script>
+    <script src="/static/scripts/modal.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+  </body>
+</html>

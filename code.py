@@ -1,29 +1,38 @@
-import web,mysql.connector
+import web
+import mainService
+
 render = web.template.render('templates/')
 urls = (
     '/', 'index',
     '/payment','payment',
     '/users', 'users',
-    '/new', 'new',
-    '/modify', 'modify',
-    '/del', 'delete',
-    '/table', 'table'
+    '/users/get', 'getUser',
+    '/users/new', 'newUser',
+    '/users/modify', 'modifyUser',
+    '/users/del', 'deleteUser',
+    '/users/plans', 'planUser',
+    '/users/plans/add', 'addPlanUser',
+    '/users/plans/end', 'endPlanUser',
+    '/plans', 'plans',
+    '/plans/new', 'newPlan',
+    '/plans/modify', 'modifyPlan',
+    '/plans/del', 'deletePlan'
 )
-
-global conn
-global cursor
-conn=mysql.connector.connect(host='localhost', database='shop', user='root', password='')
-if conn.is_connected():
-    print "Connection established"
-else:
-    print "Connection Unsuccesfull"
-    exit()
-cursor=conn.cursor()
-
 
 class index:
     def GET(self):
-        return render.index()
+        return render.index(mainService.get_db_content())
+
+class planUser:
+    def GET(self):
+        return render.user_get()
+    
+class getUser:
+    def GET(self):
+        return render.user_get()
+
+    def POST(self):
+        return render.user_profile(mainService.get_user_details(web.input()), mainService.get_plan_db_content())
 
 class payment:
     
@@ -40,64 +49,36 @@ class payment:
 
 class users:
     def GET(self):
-        return render.usersmain()
+        return render.usermain()
 
-class new:
+class newUser:
     def GET(self):
-        return render.adduser()
+        return render.user_create()
+    
+    def POST(self):
+        mainService.insert_db(web.input(), 'user')
+        return render.success('User added successfully')
+
+class deleteUser:
+    def GET(self):
+        return render.user_delete()
 
     def POST(self):
-        form= web.input(user="", cust_name="", cust_no1="", cust_no2="", pack="" )
-        print form.user,form.cust_name,form.cust_no1,form.cust_no2,form.pack
-        #to insert the customer into the cust table
-        def insert(vc,name,no1,no2,pack):
-            #to insert the customer and its details
-            if no2:
-                query="insert into cust values('"+vc+"','"+name+"',"+no1+","+no2+",'Indore')" 
-            else:
-                query="insert into cust values('"+vc+"','"+name+"',"+no1+",null,'Indore')" 
-            #cursor=conn.cursor()
-            cursor.execute(query)
-            conn.commit()
-            conn.close()
-            print 'Inserted Successfully'
-        insert(form.user,form.cust_name,form.cust_no1,form.cust_no2,form.pack)
-        return render.addsuccess()
+        mainService.delete_object(web.input(),'user')
+        return render.success('Object deleted successfully')
 
-class delete:
-    def GET(self):
-        form=web.input(user="")
-        return render.deluser(form.user)
-
+class addPlanUser:
     def POST(self):
-        form = web.input(user="")
-        def remove(vc):
-            #to delete the user
-            query="delete from cust where VC_No = '"+vc+"';"
-            cursor.execute(query)
-            conn.commit()
-            conn.close()
-            print "deleted"
-        remove(form.user)
-        return render.delsuccess()
+        mainService.assignPlanToUser(web.input())
+        return render.user_profile(mainService.get_user_details(web.input()), mainService.get_plan_db_content())
 
-class table:
-    def GET(self):
-        query="select cust.vc_no,cust.name,balance.balance,cust.mob1 from cust,balance,pcust where active_or_past=1 and cust.VC_no=balance.vc_no and cust.vc_no=pcust.vc_no"
-        cursor.execute(query)
-        rows=cursor.fetchall()
-        return render.table(rows)
+class modifyUser:
+    pass
 
+class endPlanUser:
     def POST(self):
-        return true
-
-class modify:
-    def GET(self):
-        return render.modifyuser()
-
-    def POST(self):
-        form = web.input(user="",)#user = vc
-        return render.modifysuccess()
+        mainService.end_subscription(web.input())
+        return render.user_profile(mainService.get_user_details(web.input()), mainService.get_plan_db_content())
 
 
 if __name__ == "__main__":
